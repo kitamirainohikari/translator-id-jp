@@ -8,13 +8,15 @@ const GoogleAuthButton = () => {
   const [isLoading, setIsLoading] = useState(false)
   const { toast } = useToast()
 
+  const redirectUrl = import.meta.env.VITE_SUPABASE_REDIRECT_URL || `${window.location.origin}/`;
+
   const handleGoogleLogin = async () => {
     setIsLoading(true)
     try {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/`
+          redirectTo: redirectUrl,
         }
       })
 
