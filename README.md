@@ -328,9 +328,10 @@ npm install
 
 ## 👥 Kontributor
 
-- IncoDIY     : [@incodiy](https://github.com/incodiy)
-- GeneSYNC    : [@genesync](https://github.com/genesync)
-- CodeParcel  : [@codeparcel](https://github.com/codeparcel)
+- CodeParcel       : [@codeparcel](https://github.com/codeparcel)
+- IqbalArdiandyah  : [@iqbal](https://wa.me/6288808665218)
+- IncoDIY          : [@incodiy](https://github.com/incodiy)
+- GeneSYNC         : [@genesync](https://github.com/genesync)
 
 
 ## 📞 Support
