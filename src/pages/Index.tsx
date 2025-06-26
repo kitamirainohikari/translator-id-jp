@@ -4,7 +4,7 @@ import TranslatorForm from '@/components/TranslatorForm'
 import TranslationHistory from '@/components/TranslationHistory'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Languages, History, Globe, BookOpen, Users, Zap } from 'lucide-react'
-import AnimatedTitle from '@/components/AnimatedTitle'
+import AnimatedTitle, { AppSeed } from '@/components/AnimatedTitle'
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState('translator')
@@ -18,7 +18,7 @@ const Index = () => {
         <div className="text-center mb-8">
           <div className="max-w-3xl mx-auto">
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
-              <AnimatedTitle /> <span className="text-blue-600">Translator</span>
+              <AnimatedTitle /> <br /><span className="text-blue-600">Translator</span>
             </h1>
             <p className="text-xl text-gray-600 dark:text-gray-300 mb-6">
               Aplikasi translate Indonesia ⇄ Jepang dengan AI yang mendukung level JLPT N5-N3
@@ -99,18 +99,8 @@ const Index = () => {
             </div>
           </div>
         </div>
-
-        {/* Footer */}
-        <footer className="mt-16 text-center text-gray-500 dark:text-gray-400">
-          <p className="text-sm">
-            © 2024 CodeParcel Translator. Dibuat dengan ❤️ untuk calon pekerja migran Indonesia
-          </p>
-          <div className="mt-4 p-4 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg max-w-2xl mx-auto">
-            <p className="text-sm text-yellow-800 dark:text-yellow-300">
-              <strong>Catatan:</strong> Gunakan pengaturan API untuk mengatur provider terjemahan atau aktifkan mode auto untuk pengalaman terbaik.
-            </p>
-          </div>
-        </footer>
+        {/* App Seed */}
+        <AppSeed appSeed={import.meta.env.VITE_APP_SEED || 'default-seed'} />
       </main>
     </div>
   )

@@ -23,9 +23,9 @@ const ApiSettings = ({ onApiChange }: ApiSettingsProps) => {
     openai: '',
     google: '',
     deepl: '',
-    libretranslate: '',
     mymemory: '',
     lingva: '',
+    libretranslate: '',
     argos: '',
     auto: ''
   })
@@ -119,9 +119,9 @@ const ApiSettings = ({ onApiChange }: ApiSettingsProps) => {
       case 'openai': return 'OpenAI GPT'
       case 'google': return 'Google Translate'
       case 'deepl': return 'DeepL'
-      case 'libretranslate': return 'LibreTranslate (Free)'
       case 'mymemory': return 'MyMemory (Free)'
       case 'lingva': return 'Lingva (Free)'
+      case 'libretranslate': return 'LibreTranslate (Free)'
       case 'argos': return 'Argos Translate (Free)'
       case 'auto': return 'Mode Auto (Smart)'
       default: return provider
@@ -129,7 +129,7 @@ const ApiSettings = ({ onApiChange }: ApiSettingsProps) => {
   }
 
   const isProviderFree = (provider: ApiProvider) => {
-    return ['libretranslate', 'mymemory', 'lingva', 'argos', 'auto'].includes(provider)
+    return ['mymemory', 'lingva', 'libretranslate', 'argos', 'auto'].includes(provider)
   }
 
   return (
@@ -180,9 +180,9 @@ const ApiSettings = ({ onApiChange }: ApiSettingsProps) => {
                   <SelectValue placeholder="Pilih provider API" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="libretranslate">🆓 LibreTranslate (Free)</SelectItem>
                   <SelectItem value="mymemory">🆓 MyMemory (Free)</SelectItem>
                   <SelectItem value="lingva">🆓 Lingva (Free)</SelectItem>
+                  <SelectItem value="libretranslate">🆓 LibreTranslate (Free)</SelectItem>
                   <SelectItem value="argos">🆓 Argos Translate (Free)</SelectItem>
                   <SelectItem value="openai">🤖 OpenAI GPT (Paid)</SelectItem>
                   <SelectItem value="google">🌐 Google Translate (Paid)</SelectItem>
@@ -225,8 +225,8 @@ const ApiSettings = ({ onApiChange }: ApiSettingsProps) => {
             <p><strong>Rekomendasi:</strong></p>
             <ul className="list-disc list-inside space-y-1 mt-1">
               <li><strong>Mode Auto:</strong> Sistem pilih API terbaik otomatis</li>
-              <li><strong>LibreTranslate:</strong> Open source, gratis tanpa batas</li>
               <li><strong>MyMemory:</strong> Gratis 1000 karakter/hari</li>
+              <li><strong>LibreTranslate:</strong> Open source, gratis tanpa batas</li>
               <li><strong>OpenAI:</strong> Terjemahan paling akurat dengan konteks</li>
             </ul>
           </div>

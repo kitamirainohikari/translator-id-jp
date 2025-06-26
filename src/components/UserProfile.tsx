@@ -6,10 +6,11 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { User, Mail, Calendar, Save, Camera } from 'lucide-react'
+import { User, Mail, Calendar, Save, Camera, Upload, X } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useToast } from '@/hooks/use-toast'
 import { User as SupabaseUser } from '@supabase/supabase-js'
+import { compressImage, generateAvatarUrl, getCachedAvatarUrl, clearAvatarCache } from '@/utils/imageUtils'
 
 interface UserProfile {
   id: string
@@ -33,7 +34,130 @@ const UserProfile = ({ user }: UserProfileProps) => {
     created_at: user.created_at
   })
   const [isLoading, setIsLoading] = useState(false)
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false)
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const { toast } = useToast()
+
+  useEffect(() => {
+    // Load current avatar if exists
+    if (profile.avatar_url && !profile.avatar_url.startsWith('blob:')) {
+      loadCurrentAvatar()
+    }
+  }, [profile.avatar_url])
+
+  const loadCurrentAvatar = async () => {
+    try {
+      const avatarPath = generateAvatarUrl(user.id)
+      const { data } = supabase.storage.from('avatars').getPublicUrl(avatarPath)
+      
+      if (data?.publicUrl) {
+        const cachedUrl = getCachedAvatarUrl(user.id, data.publicUrl)
+        setProfile(prev => ({ ...prev, avatar_url: cachedUrl }))
+      }
+    } catch (error) {
+      if (import.meta.env.MODE === 'development') {
+        console.error('Error loading avatar:', error)
+      }
+    }
+  }
+
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: "File Tidak Valid",
+        description: "Pilih file gambar (JPG, PNG, WebP)",
+        variant: "destructive"
+      })
+      return
+    }
+
+    if (file.size > 2 * 1024 * 1024) { // 2MB limit
+      toast({
+        title: "File Terlalu Besar", 
+        description: "Ukuran file maksimal 2MB",
+        variant: "destructive"
+      })
+      return
+    }
+
+    setSelectedFile(file)
+    
+    // Create preview
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      setPreviewUrl(e.target?.result as string)
+    }
+    reader.readAsDataURL(file)
+  }
+
+  const handleAvatarUpload = async () => {
+    if (!selectedFile) return
+
+    setIsUploadingAvatar(true)
+    try {
+      // Compress image
+      const compressedBlob = await compressImage(selectedFile)
+      
+      // Delete old avatar if exists
+      const avatarPath = generateAvatarUrl(user.id)
+      await supabase.storage.from('avatars').remove([avatarPath])
+
+      // Upload new avatar
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(avatarPath, compressedBlob, {
+          cacheControl: '3600',
+          upsert: true
+        })
+
+      if (uploadError) throw uploadError
+
+      // Get public URL
+      const { data } = supabase.storage.from('avatars').getPublicUrl(avatarPath)
+      
+      if (data?.publicUrl) {
+        // Clear cache and update profile
+        clearAvatarCache(user.id)
+        const newAvatarUrl = `${data.publicUrl}?t=${Date.now()}` // Cache bust
+        
+        // Update auth metadata
+        const { error: updateError } = await supabase.auth.updateUser({
+          data: { avatar_url: newAvatarUrl }
+        })
+
+        if (updateError) throw updateError
+
+        setProfile(prev => ({ ...prev, avatar_url: newAvatarUrl }))
+        setSelectedFile(null)
+        setPreviewUrl(null)
+
+        toast({
+          title: "Avatar Berhasil Diperbarui",
+          description: "Foto profil Anda telah tersimpan"
+        })
+      }
+    } catch (error) {
+      if (import.meta.env.MODE === 'development') {
+        console.error('Avatar upload error:', error)
+      }
+      toast({
+        title: "Gagal Upload Avatar",
+        description: "Terjadi kesalahan saat mengupload foto",
+        variant: "destructive"
+      })
+    } finally {
+      setIsUploadingAvatar(false)
+    }
+  }
+
+  const cancelAvatarSelection = () => {
+    setSelectedFile(null)
+    setPreviewUrl(null)
+  }
 
   const handleInputChange = (field: keyof UserProfile, value: string) => {
     setProfile(prev => ({
@@ -61,7 +185,9 @@ const UserProfile = ({ user }: UserProfileProps) => {
 
       setIsOpen(false)
     } catch (error) {
-      console.error('Profile update error:', error)
+      if (import.meta.env.MODE === 'development') {
+        console.error('Profile update error:', error)
+      }
       toast({
         title: "Gagal Menyimpan",
         description: "Terjadi kesalahan saat menyimpan profil",
@@ -115,22 +241,71 @@ const UserProfile = ({ user }: UserProfileProps) => {
           <div className="flex flex-col items-center space-y-4">
             <div className="relative">
               <Avatar className="w-20 h-20">
-                <AvatarImage src={profile.avatar_url} />
+                <AvatarImage src={previewUrl || profile.avatar_url} />
                 <AvatarFallback className="text-lg font-bold">
                   {profile.full_name ? getInitials(profile.full_name) : getInitials(profile.email)}
                 </AvatarFallback>
               </Avatar>
-              <Button
-                variant="outline"
-                size="sm"
-                className="absolute -bottom-1 -right-1 h-8 w-8 rounded-full p-0"
-                onClick={() => toast({
-                  title: "Fitur Segera Hadir",
-                  description: "Upload foto profil akan tersedia dalam update berikutnya"
-                })}
-              >
-                <Camera className="w-3 h-3" />
-              </Button>
+            </div>
+
+            {/* Avatar Upload Controls */}
+            <div className="flex flex-col items-center space-y-2">
+              {!selectedFile ? (
+                <div>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileSelect}
+                    className="hidden"
+                    id="avatar-upload"
+                  />
+                  <Label htmlFor="avatar-upload">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="cursor-pointer"
+                      asChild
+                    >
+                      <span className="flex items-center space-x-2">
+                        <Camera className="w-4 h-4" />
+                        <span>Ganti Foto</span>
+                      </span>
+                    </Button>
+                  </Label>
+                </div>
+              ) : (
+                <div className="flex space-x-2">
+                  <Button
+                    onClick={handleAvatarUpload}
+                    disabled={isUploadingAvatar}
+                    size="sm"
+                    className="flex items-center space-x-2"
+                  >
+                    {isUploadingAvatar ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        <span>Upload...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="w-4 h-4" />
+                        <span>Upload</span>
+                      </>
+                    )}
+                  </Button>
+                  <Button
+                    onClick={cancelAvatarSelection}
+                    variant="outline"
+                    size="sm"
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
+              )}
+              <p className="text-xs text-gray-500 text-center">
+                Max 2MB • JPG, PNG, WebP<br/>
+                Akan dioptimalkan ke 300x300px
+              </p>
             </div>
           </div>
 

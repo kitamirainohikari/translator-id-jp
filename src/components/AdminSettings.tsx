@@ -29,9 +29,9 @@ const AdminSettings = () => {
   const { isAdmin, isLoading } = useUserRole(user)
   const [isOpen, setIsOpen] = useState(false)
   const [apis, setApis] = useState<ApiConfig[]>([
-    { id: 'libretranslate', name: 'LibreTranslate (Free)', enabled: true, apiKey: '', isFree: true, order: 1 },
-    { id: 'mymemory', name: 'MyMemory (Free)', enabled: true, apiKey: '', isFree: true, order: 2 },
-    { id: 'lingva', name: 'Lingva (Free)', enabled: true, apiKey: '', isFree: true, order: 3 },
+    { id: 'mymemory', name: 'MyMemory (Free)', enabled: true, apiKey: '', isFree: true, order: 1 },
+    { id: 'lingva', name: 'Lingva (Free)', enabled: true, apiKey: '', isFree: true, order: 2 },
+    { id: 'libretranslate', name: 'LibreTranslate (Free)', enabled: true, apiKey: '', isFree: true, order: 3 },
     { id: 'argos', name: 'Argos Translate (Free)', enabled: true, apiKey: '', isFree: true, order: 4 },
     { id: 'openai', name: 'OpenAI GPT', enabled: false, apiKey: '', isFree: false, order: 5 },
     { id: 'google', name: 'Google Translate', enabled: false, apiKey: '', isFree: false, order: 6 },

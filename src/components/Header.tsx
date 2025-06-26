@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { supabase } from '@/lib/supabase'
 import { User } from '@supabase/supabase-js'
@@ -9,13 +9,14 @@ import AuthModal from './AuthModal'
 import { QuickThemeToggle } from './QuickThemeToggle'
 import ApiSettings from './ApiSettings'
 import UserProfile from './UserProfile'
-import AdminSettings from './AdminSettings'
 import AnimatedTitle from './AnimatedTitle'
 
 const Header = () => {
   const [user, setUser] = useState<User | null>(null)
   const [showAuthModal, setShowAuthModal] = useState(false)
   const { toast } = useToast()
+  const toastShown = useRef(false)
+  const [logoUrl, setLogoUrl] = useState('')
 
   useEffect(() => {
     // Get initial session
@@ -37,15 +38,21 @@ const Header = () => {
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
-        console.log('Auth state changed:', event, session?.user?.email)
         setUser(session?.user ?? null)
         
         if (event === 'SIGNED_IN') {
-          toast({
-            title: "Login Berhasil!",
-            description: `Selamat datang, ${session?.user?.email}`
-          })
+          if (sessionStorage.getItem('toastShown') !== 'true') {
+            console.log('Auth state changed:', event, session?.user?.email)
+            toastShown.current = true
+            sessionStorage.setItem('toastShown', 'true')
+
+            toast({
+              title: "Login Berhasil!",
+              description: `Selamat datang, ${session?.user?.email}`
+            })
+          }
         } else if (event === 'SIGNED_OUT') {
+          sessionStorage.removeItem('toastShown')
           toast({
             title: "Logout Berhasil",
             description: "Sampai jumpa lagi!"
@@ -53,6 +60,8 @@ const Header = () => {
         }
       }
     )
+    const savedLogoUrl = "https://lh3.googleusercontent.com/a/ACg8ocJ9Z7FEYJr4S2NAVUSpTuVfCmo86DXh-tz2Tuj0SUqZgNdg2D4=s96-c"//localStorage.getItem('app-logo-url')
+    if (savedLogoUrl) setLogoUrl(savedLogoUrl)
 
     return () => subscription.unsubscribe()
   }, [toast])
@@ -81,7 +90,17 @@ const Header = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-sakura-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">CP</span>
+                <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-sakura-600 rounded-lg flex items-center justify-center">
+                  {logoUrl ? (
+                    <img 
+                      src={logoUrl} 
+                      alt="App Logo" 
+                      className="w-full h-full object-cover rounded-lg"
+                    />
+                  ) : (
+                    <span className="text-white font-bold text-sm">Tr</span>
+                  )}
+                </div>
               </div>
               <div>
                 <h1 className="text-xl font-bold text-gray-900 dark:text-white">
@@ -92,7 +111,6 @@ const Header = () => {
             </div>
 
             <div className="flex items-center space-x-3">
-              <AdminSettings />
               <ApiSettings />
               <QuickThemeToggle />
               
