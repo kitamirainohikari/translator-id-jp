@@ -8,7 +8,9 @@ const GoogleAuthButton = () => {
   const [isLoading, setIsLoading] = useState(false)
   const { toast } = useToast()
 
-  const redirectUrl = import.meta.env.VITE_SUPABASE_REDIRECT_URL || `${window.location.origin}/`;
+  const isProd = import.meta.env.MODE === 'production'
+  const redirectUrl = import.meta.env.VITE_SUPABASE_REDIRECT_URL || 
+    (isProd ? 'https://kitamirainohikari.github.io/translator-id-jp/' : 'http://localhost:5173/');
 
   const handleGoogleLogin = async () => {
     setIsLoading(true)

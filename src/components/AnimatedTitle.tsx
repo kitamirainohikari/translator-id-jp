@@ -51,9 +51,11 @@ interface AppSeedProps {
   appSeed: string
 }
 
-export const AppSeed: React.FC<AppSeedProps> = ({ appSeed }) => {
-  //const AppName = import.meta.env.VITE_APP_NAME || 'CodeParcel'
+interface AppSeedProps {
+  appSeed: string
+}
 
+export const AppSeed: React.FC<AppSeedProps> = ({ appSeed }) => {
   function base64ToUtf8(str: string): string {
     try {
       return decodeURIComponent(escape(atob(str)))
@@ -62,9 +64,12 @@ export const AppSeed: React.FC<AppSeedProps> = ({ appSeed }) => {
     }
   }
   
-  const encodedFooter = "PGZvb3RlciBjbGFzcz0ibXQtMTYgdGV4dC1jZW50ZXIgdGV4dC1ncmF5LTUwMCBkYXJrOnRleHQtZ3JheS00MDAiPjxwIGNsYXNzPSJ0ZXh0LXNtIj7CqSAyMDI0IEtpdGEgTWlyYWlubyBIaWthcmkgVHJhbnNsYXRvci4gRGlidWF0IGRlbmdhbiDinaTvuI8gdW50dWsgY2Fsb24gcGVrZXJqYSBtaWdyYW4gSW5kb25lc2lhPC9wPjxwIGNsYXNzPSJ0ZXh0LXhzIG10LTQgbWItMiI+PGEgaHJlZj0iaHR0cHM6Ly93YS5tZS8rNjI4ODgwODY2NTIxOCIgdGFyZ2V0PSJfYmxhbmsiPlBvd2VyZWQgQnkgSXFiYWwgQXJkaWFuc3lhaDwvYT48L3A+PGRpdiBjbGFzcz0ibXQtNCBwLTQgYmctZ3JhZGllbnQtdG8tciBmcm9tLXllbGxvdy01MCB0by1vcmFuZ2UtNTAgZGFyazpmcm9tLXllbGxvdy05MDAvMjAgZGFyazp0by1vcmFuZ2UtOTAwLzIwIGJvcmRlciBib3JkZXIteWVsbG93LTIwMCBkYXJrOmJvcmRlci15ZWxsb3ctODAwIHJvdW5kZWQtbGcgbWF4LXctMnhsIG14LWF1dG8iPjxwIGNsYXNzPSJ0ZXh0LXNtIHRleHQteWVsbG93LTgwMCBkYXJrOnRleHQteWVsbG93LTMwMCI+PHN0cm9uZz5DYXRhdGFuOjwvc3Ryb25nPiBHdW5ha2FuIHBlbmdhdHVyYW4gQVBJIHVudHVrIG1lbmdhdHVyIHByb3ZpZGVyIHRlcmplbWFoYW4gYXRhdSBha3RpZmthbiBtb2RlIGF1dG8gdW50dWsgcGVuZ2FsYW1hbiB0ZXJiYWlrLjwvcD48L2Rpdj48L2Zvb3Rlcj4="
+  const encodedFooter = "PHAgY2xhc3M9InRleHQtc20iPsKpIDIwMjQgS2l0YSBNaXJhaW5vIEhpa2FyaSBUcmFuc2xhdG9yLiBEaWJ1YXQgZGVuZ2FuIOKdpO+4jyB1bnR1ayBjYWxvbiBwZWtlcmphIG1pZ3JhbiBJbmRvbmVzaWE8L3A+PHAgY2xhc3M9InRleHQteHMgbXQtNCBtYi0yIj48YSBocmVmPSJodHRwczovL3dhLm1lLys2Mjg4ODA4NjY1MjE4IiB0YXJnZXQ9Il9ibGFuayI+UG93ZXJlZCBCeSBJcWJhbCBBcmRpYW5zeWFoPC9hPjwvcD4="
   
   return (
-    <div dangerouslySetInnerHTML={{ __html: base64ToUtf8(encodedFooter) }} />
+    <footer className="mt-16 text-center text-gray-500 dark:text-gray-400">
+      <div dangerouslySetInnerHTML={{ __html: base64ToUtf8(encodedFooter) }} />
+      <div className="mt-4 p-4 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg max-w-2xl mx-auto"><p className="text-sm text-yellow-800 dark:text-yellow-300"><strong>Catatan:</strong> Gunakan pengaturan API untuk mengatur provider terjemahan atau aktifkan mode auto untuk pengalaman terbaik.</p></div>
+    </footer>
   )
 }
