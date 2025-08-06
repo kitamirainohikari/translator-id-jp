@@ -1,3 +1,12 @@
+**Author**: CanvaStack <canvastacks@gmail.com>   
+**Date**:   2025-08-06
+
+    ソースコード納品についての条件
+
+    現在、デポジットは契約金額の20 ％です。契約金額の80 ％の支払いを確認した後、ソースコードの送信を処理します。
+
+
+
 
 # 🌸 CodeParcel Translator - Indonesia ⇄ Jepang (JLPT N5-N3)
 
